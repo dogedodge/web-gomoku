@@ -19,7 +19,7 @@ export function GoBoard(props: GoBoardProps) {
   for (let i = 0; i < LINE_NUM; i++) {
     // horizontal lines
     lines.push(<line
-      key={i}
+      key={`h${i}`}
       x1={goSize * 0.5}
       y1={goSize * (0.5 + i)}
       x2={size - goSize * 0.5}
@@ -30,7 +30,7 @@ export function GoBoard(props: GoBoardProps) {
 
     // vertical lines
     lines.push(<line
-      key={i}
+      key={`v${i}`}
       x1={goSize * (0.5 + i)}
       y1={goSize * 0.5}
       x2={goSize * (0.5 + i)}
