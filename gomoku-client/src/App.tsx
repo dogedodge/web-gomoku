@@ -3,13 +3,17 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import { GoBoard } from './components/GoBoard'
+import { Provider } from 'react-redux'
+import { store } from './store/store'
 
 function App() {
   // const [count, setCount] = useState(0)
 
   return (
     <>
+    <Provider store={store}>
       <GoBoard size={400} gridStrokeWidth={2}></GoBoard>
+    </Provider>
       {/* <div>
         <a href="https://vitejs.dev" target="_blank">
           <img src={viteLogo} className="logo" alt="Vite logo" />

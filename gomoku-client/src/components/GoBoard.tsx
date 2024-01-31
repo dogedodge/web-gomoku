@@ -1,6 +1,6 @@
-import { Go, GoState } from "./Go";
-
-const LINE_NUM = 15;
+import { GoState, LINE_NUM } from "../constant";
+import { useAppSelector } from "../store/hooks";
+import { Go } from "./Go";
 
 interface GoBoardProps {
   size: number; // width & height in pixcel
@@ -12,6 +12,7 @@ export function GoBoard(props: GoBoardProps) {
     size,
     gridStrokeWidth
   } = props;
+  const goStateMap = useAppSelector(state=>state.game.goStateMap);
 
   const goSize = size / 15;
 
@@ -50,9 +51,11 @@ export function GoBoard(props: GoBoardProps) {
       goList.push(<Go 
         key={`${i}-${j}`}
         cx={cx} 
-        cy={cy} 
+        cy={cy}
+        xIndex={i}
+        yIndex={j}
         size={goSize} 
-        state={GoState.WHITE}></Go>)
+        state={goStateMap[i][j]}></Go>)
     }
   }
 
