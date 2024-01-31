@@ -1,3 +1,5 @@
+import { Go, GoState } from "./Go";
+
 const LINE_NUM = 15;
 
 interface GoBoardProps {
@@ -13,7 +15,7 @@ export function GoBoard(props: GoBoardProps) {
 
   const goSize = size / 15;
 
-  const lines: any[] = [];
+  const lines: JSX.Element[] = [];
 
 
   for (let i = 0; i < LINE_NUM; i++) {
@@ -40,10 +42,20 @@ export function GoBoard(props: GoBoardProps) {
     ></line>)
   }
 
+  const goList: JSX.Element[] = [];
+  for (let i = 0; i < LINE_NUM; i++) {
+    for (let j = 0; j < LINE_NUM; j++) {
+      const cx = (0.5 + i) * goSize;
+      const cy = (0.5 + j) * goSize;
+      goList.push(<Go cx={cx} cy={cy} size={goSize} state={GoState.WHITE}></Go>)
+    }
+  }
+
   return (
     <svg width={size} height={size}>
       <rect width={size} height={size} fill="white"></rect>
       {lines}
+      {goList}
     </svg>
   )
 }
