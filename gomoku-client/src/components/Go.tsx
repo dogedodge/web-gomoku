@@ -18,7 +18,11 @@ export function Go(props: GoProps) {
 
   const r = size/2 - 2;
 
+  function onClick(){
+    console.log(`click ${cx} ${cy}`);
+  }
+
   return (
-    <circle cx={cx} cy={cy} r={r} fill={fill} stroke="black" strokeWidth={2}></circle>
+    <circle onClick={onClick} cx={cx} cy={cy} r={r} fill={fill} stroke="black" strokeWidth={2}></circle>
   )
 }

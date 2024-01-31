@@ -47,7 +47,12 @@ export function GoBoard(props: GoBoardProps) {
     for (let j = 0; j < LINE_NUM; j++) {
       const cx = (0.5 + i) * goSize;
       const cy = (0.5 + j) * goSize;
-      goList.push(<Go cx={cx} cy={cy} size={goSize} state={GoState.WHITE}></Go>)
+      goList.push(<Go 
+        key={`${i}-${j}`}
+        cx={cx} 
+        cy={cy} 
+        size={goSize} 
+        state={GoState.WHITE}></Go>)
     }
   }
 
