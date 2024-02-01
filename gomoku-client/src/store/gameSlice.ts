@@ -1,5 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { GoState, LINE_NUM } from "../constant";
+import { checkWin } from "../utils/checkWin";
 
 interface GameState {
   currentTurn: GoState;
@@ -16,6 +17,7 @@ const gameSlice = createSlice({
     placeGo: (state, action: PayloadAction<{ x: number, y: number }>) => {
       const {x, y} = action.payload;
       state.goStateMap[x][y] = state.currentTurn;
+      checkWin(state.goStateMap);
       // take turn
       state.currentTurn = state.currentTurn === GoState.BLACK ? GoState.WHITE : GoState.BLACK;
     }
