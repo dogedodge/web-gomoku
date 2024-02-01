@@ -1,0 +1,19 @@
+{
+  "name": "web-gomoku",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/dogedodge/web-gomoku.git",
+  "author": "dogedodge <dogedodge@mail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "husky": ">=6",
+    "lint-staged": ">=10",
+    "prettier": "^3.2.4"
+  },
+  "scripts": {
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "*.{js,css,md}": "prettier --write"
+  }
+}
