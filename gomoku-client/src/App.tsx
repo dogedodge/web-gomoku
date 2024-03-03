@@ -1,19 +1,21 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import { GoBoard } from './components/GoBoard'
-import { Provider } from 'react-redux'
-import { store } from './store/store'
+import { useState } from "react";
+import reactLogo from "./assets/react.svg";
+import viteLogo from "/vite.svg";
+import "./App.css";
+import { GoBoard } from "./components/GoBoard";
+import { Provider } from "react-redux";
+import { store } from "./store/store";
+import { Popup } from "./components/Popup";
 
 function App() {
   // const [count, setCount] = useState(0)
 
   return (
     <>
-    <Provider store={store}>
-      <GoBoard size={400} gridStrokeWidth={2}></GoBoard>
-    </Provider>
+      <Provider store={store}>
+        <GoBoard size={400} gridStrokeWidth={2}></GoBoard>
+        <Popup></Popup>
+      </Provider>
       {/* <div>
         <a href="https://vitejs.dev" target="_blank">
           <img src={viteLogo} className="logo" alt="Vite logo" />
@@ -35,7 +37,7 @@ function App() {
         Click on the Vite and React logos to learn more
       </p> */}
     </>
-  )
+  );
 }
 
-export default App
+export default App;
