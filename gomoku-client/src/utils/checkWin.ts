@@ -1,5 +1,10 @@
 import { GoState } from "../constant";
 
+/**
+ *
+ * @param goStateMap
+ * @returns winer's color
+ */
 export function checkWin(goStateMap: GoState[][]) {
   const verticalStr = goStateMap.map((column) => column.join("")).join("x");
   const horizontalStr = transposeMatrix(goStateMap)

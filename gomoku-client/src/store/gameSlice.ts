@@ -4,28 +4,28 @@ import { checkWin } from "../utils/checkWin";
 
 interface GameState {
   currentTurn: GoState;
-  goStateMap: GoState[][]
+  goStateMap: GoState[][];
+  winner: GoState;
 }
 
 const gameSlice = createSlice({
-  name: 'game',
+  name: "game",
   initialState: {
     currentTurn: GoState.BLACK,
-    goStateMap: Array.from({ length: LINE_NUM }, () => Array(LINE_NUM).fill(0))
+    goStateMap: Array.from({ length: LINE_NUM }, () => Array(LINE_NUM).fill(0)),
   } as GameState,
   reducers: {
-    placeGo: (state, action: PayloadAction<{ x: number, y: number }>) => {
-      const {x, y} = action.payload;
+    placeGo: (state, action: PayloadAction<{ x: number; y: number }>) => {
+      const { x, y } = action.payload;
       state.goStateMap[x][y] = state.currentTurn;
-      checkWin(state.goStateMap);
-      // take turn
-      state.currentTurn = state.currentTurn === GoState.BLACK ? GoState.WHITE : GoState.BLACK;
-    }
-  }
+      state.winner = checkWin(state.goStateMap);
+      // other side take turn
+      state.currentTurn =
+        state.currentTurn === GoState.BLACK ? GoState.WHITE : GoState.BLACK;
+    },
+  },
 });
 
 export default gameSlice.reducer;
 
-export const {
-  placeGo
-} = gameSlice.actions;
+export const { placeGo } = gameSlice.actions;
