@@ -1,7 +1,9 @@
 export enum GoState {
   NONE,
   BLACK,
-  WHITE
+  WHITE,
 }
 
-export const LINE_NUM = 15;
+export type Board = number[][];
+
+export const BOARD_SIZE = 15;

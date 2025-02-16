@@ -1,6 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { GoState, LINE_NUM } from "../constant";
-import { checkWin } from "../utils/checkWin";
+import { GoState, BOARD_SIZE } from "../constant";
+// import { checkWin } from "../utils/checkWin";
+import { checkWinner } from "../utils/checkWinner";
 
 interface GameState {
   currentTurn: GoState;
@@ -12,7 +13,9 @@ const gameSlice = createSlice({
   name: "game",
   initialState: {
     currentTurn: GoState.BLACK,
-    goStateMap: Array.from({ length: LINE_NUM }, () => Array(LINE_NUM).fill(0)),
+    goStateMap: Array.from({ length: BOARD_SIZE }, () =>
+      Array(BOARD_SIZE).fill(0),
+    ),
     winner: GoState.NONE,
   } as GameState,
   reducers: {
@@ -28,7 +31,10 @@ const gameSlice = createSlice({
       }
 
       state.goStateMap[x][y] = state.currentTurn;
-      state.winner = checkWin(state.goStateMap);
+      if (checkWinner(state.goStateMap, x, y, state.currentTurn)) {
+        state.winner = state.currentTurn;
+        console.log(`Winner: ${state.winner}`);
+      }
       // other side take turn
       state.currentTurn =
         state.currentTurn === GoState.BLACK ? GoState.WHITE : GoState.BLACK;
