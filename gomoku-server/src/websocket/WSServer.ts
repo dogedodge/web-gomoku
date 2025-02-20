@@ -49,15 +49,15 @@ export class WSServer {
   async start(): Promise<void> {
     return new Promise((resolve) => {
       // 创建 HTTP 服务器用于健康检查
-      this.httpServer = http.createServer((req, res) => {
-        if (req.url === "/health") {
-          res.writeHead(200, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ status: "healthy" }));
-          return;
-        }
-        res.writeHead(404);
-        res.end();
-      });
+      // this.httpServer = http.createServer((req, res) => {
+      //   if (req.url === "/health") {
+      //     res.writeHead(200, { "Content-Type": "application/json" });
+      //     res.end(JSON.stringify({ status: "healthy" }));
+      //     return;
+      //   }
+      //   res.writeHead(404);
+      //   res.end();
+      // });
       // 初始化消息处理器
       this.handler = new GameWebSocketHandler(this.wss, this.roomManager);
 
@@ -65,10 +65,10 @@ export class WSServer {
       this.configureKeepAlive();
 
       // 监听 HTTP 服务器
-      this.httpServer.listen(this.config.port, () => {
-        console.log(`🚀 WebSocket server started on port ${this.config.port}`);
-        resolve();
-      });
+      // this.httpServer.listen(this.config.port, () => {
+      //   console.log(`🚀 WebSocket server started on port ${this.config.port}`);
+      //   resolve();
+      // });
 
       // 注册优雅关闭
       this.registerGracefulShutdown();
