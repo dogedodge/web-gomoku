@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "es2017",  // Or a later version supported by your Node.js runtime
+    "module": "CommonJS",  // Use 'esnext' to preserve ES module syntax
+    "moduleResolution": "node", // Or 'node16'/'nodenext' depending on your Node.js version and desired behavior
+    "outDir": "./dist",
+    "esModuleInterop": true, // Required for compatibility with CommonJS modules
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "sourceMap": true // Optional:  Enable source maps for debugging
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+}

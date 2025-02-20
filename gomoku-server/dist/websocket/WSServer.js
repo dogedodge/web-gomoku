@@ -1,16 +1,14 @@
-import WebSocket, { WebSocketServer } from "ws";
-import { ClientMessage } from "../types/messages";
-
-export class WSServer {
-  private wss: WebSocketServer;
-
-  constructor(port: number) {
-    this.wss = new WebSocketServer({ port });
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.WSServer = void 0;
+const ws_1 = require("ws");
+class WSServer {
+  constructor(port) {
+    this.wss = new ws_1.WebSocketServer({ port });
     this.setupHandlers();
     console.log(`WebSocket server started on port ${port}`);
   }
-
-  private setupHandlers() {
+  setupHandlers() {
     this.wss.on("connection", (ws) => {
       ws.on("message", (raw) => {
         const message = raw.toString();
@@ -19,10 +17,9 @@ export class WSServer {
       ws.on("close", () => this.handleDisconnect(ws));
     });
   }
-
-  private async handleMessage(raw: string, _ws: WebSocket) {
+  async handleMessage(raw, _ws) {
     // try {
-    const message: ClientMessage = JSON.parse(raw);
+    const message = JSON.parse(raw);
     console.log("Received message:", message);
     // 使用策略模式路由到对应的处理器
     // const handler = getHandler(message.type);
@@ -31,11 +28,12 @@ export class WSServer {
     //   this.sendError(ws, err);
     // }
   }
-
-  private handleDisconnect(_ws: WebSocket) {
+  handleDisconnect(_ws) {
     console.log("Client disconnected");
   }
-  private sendError(ws: WebSocket, err: Error) {
+  sendError(ws, err) {
     ws.send(JSON.stringify({ type: "error", data: err.message }));
   }
 }
+exports.WSServer = WSServer;
+//# sourceMappingURL=WSServer.js.map
