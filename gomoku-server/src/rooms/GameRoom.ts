@@ -25,6 +25,7 @@ export class GameRoom {
   }> = [];
   private lastActivity = Date.now();
   private gameStarted = false;
+  private isGameEnded = false;
   private moveLock = false;
 
   constructor(
@@ -173,6 +174,7 @@ export class GameRoom {
       win_reason: "FIVE_IN_ROW",
       win_positions: winResult!.positions,
     });
+    this.isGameEnded = true;
     this.cleanup();
   }
 
@@ -196,9 +198,38 @@ export class GameRoom {
     this.lastActivity = Date.now();
   }
 
-  private cleanup() {
+  public getLastActivity() {
+    return this.lastActivity;
+  }
+
+  public cleanup() {
     [this.players.black, this.players.white].forEach((player) => {
       player?.ws.close();
     });
+  }
+
+  public handlePlayerDisconnect(playerId: string) {
+    // todo
+
+    console.log("Player disconnected: ", playerId);
+  }
+
+  public getGameStarted() {
+    return this.gameStarted;
+  }
+
+  public getIsGameEnded() {
+    return this.isGameEnded;
+  }
+
+  public getPlayerCount(): number {
+    let playerCount = 0;
+    if (this.players.black) {
+      playerCount++;
+    }
+    if (this.players.white) {
+      playerCount++;
+    }
+    return playerCount;
   }
 }
