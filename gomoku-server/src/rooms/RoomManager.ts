@@ -159,4 +159,10 @@ export class RoomManager {
       }
     }, 5000); // 5秒后再次检查
   }
+
+  public getRooms() {
+    return this.rooms;
+  }
 }
+
+export const roomManager = new RoomManager();

@@ -6,6 +6,7 @@
 export type Coord = [number, number]; // 棋盘坐标[x,y]
 type StoneType = "black" | "white";
 export type PlayerID = string;
+export type PlayerRole = "black" | "white";
 
 /********************
  * 客户端发送消息类型
@@ -20,43 +21,43 @@ export type ClientMessage =
 
 export interface BaseClientMessage {
   type: string;
-  room_id?: string; // 大部分操作需要房间ID
-  player_id?: PlayerID; // 部分操作需要玩家ID
+  roomId?: string; // 大部分操作需要房间ID
+  playerId?: PlayerID; // 部分操作需要玩家ID
 }
 
 // 创建房间
 export interface CreateRoomMessage extends BaseClientMessage {
   type: "create_room";
-  player_name: string;
+  playerName: string;
 }
 
 // 加入房间
 export interface JoinRoomMessage extends BaseClientMessage {
   type: "join_room";
-  room_id: string; // 覆盖基类可选定义
-  player_name: string;
+  roomId: string; // 覆盖基类可选定义
+  playerName: string;
 }
 
 // 落子操作
 export interface PlaceStoneMessage extends BaseClientMessage {
   type: "place_stone";
-  room_id: string;
-  player_id: PlayerID;
+  roomId: string;
+  playerId: PlayerID;
   position: Coord;
 }
 
 // 悔棋请求
 export interface RequestUndoMessage extends BaseClientMessage {
   type: "request_undo";
-  room_id: string;
-  player_id: PlayerID;
+  roomId: string;
+  playerId: PlayerID;
 }
 
 // 悔棋响应
 export interface RespondUndoMessage extends BaseClientMessage {
   type: "respond_undo";
-  room_id: string;
-  player_id: PlayerID;
+  roomId: string;
+  playerId: PlayerID;
   accept: boolean;
 }
 
@@ -95,16 +96,19 @@ export interface WelcomeMessage extends BaseServerMessage {
 // 房间创建成功
 export interface RoomCreatedMessage extends BaseServerMessage {
   type: "room_created";
-  room_id: string;
-  player_id: PlayerID;
-  expire_time: number;
+  roomId: string;
+  playerId: PlayerID;
+  role: PlayerRole;
+  // expire_time: number;
 }
 
 // 加入房间成功
 export interface JoinSuccessMessage extends BaseServerMessage {
   type: "join_success";
-  player_id: PlayerID;
-  opponent_name: string;
+  playerId: PlayerID;
+  roomId: string;
+  // opponent_name: string;
+  role: PlayerRole;
 }
 
 // 错误消息
@@ -116,7 +120,10 @@ export type ErrorCode =
   | "GAME_ALREADY_ENDED"
   | "INVALID_ACTION"
   | "SYSTEM_BUSY"
-  | "GAME_NOT_STARTED";
+  | "GAME_NOT_STARTED"
+  | "INVALID_MESSAGE"
+  | "SERVER_ERROR"
+  | "UNKNOWN_ERROR";
 
 export interface ErrorMessage extends BaseServerMessage {
   type: "error";
@@ -135,8 +142,8 @@ export interface GameStartMessage extends BaseServerMessage {
 // 落子广播
 export interface StonePlacedMessage extends BaseServerMessage {
   type: "stone_placed";
-  // room_id: string;
-  player_id: PlayerID;
+  // roomId: string;
+  playerId: PlayerID;
   position: Coord;
   next_turn: PlayerID | null;
   board_state?: string; // 可选压缩棋盘状态

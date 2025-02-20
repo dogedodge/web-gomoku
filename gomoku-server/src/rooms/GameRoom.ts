@@ -7,9 +7,10 @@ import {
   ErrorMessage,
   PlayerID,
   Coord,
+  PlayerRole,
 } from "../types/messages";
 
-type PlayerRole = "black" | "white";
+// type PlayerRole = "black" | "white";
 
 export class GameRoom {
   private board: Board;
@@ -118,7 +119,7 @@ export class GameRoom {
       // 广播落子结果
       this.broadcast({
         type: "stone_placed",
-        player_id: playerId,
+        playerId,
         position,
         next_turn: winResult ? null : nextTurn,
         board_state: this.board.getCompressedState(),
