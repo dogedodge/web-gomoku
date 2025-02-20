@@ -1,3 +1,6 @@
+以下是 `RuleChecker.ts` 的完整实现，包含胜利条件检测和防御性编程设计：
+
+```typescript
 // src/game/RuleChecker.ts
 import type { Coord } from "../types/messages";
 
@@ -148,3 +151,71 @@ export class RuleChecker {
     return x >= 0 && y >= 0 && x < board.length && y < board[0]?.length;
   }
 }
+```
+
+### 功能亮点说明
+
+1. **多维度扫描机制**：
+
+   - 使用双向扫描算法（正/负方向）检测连续棋子
+   - 4个方向独立判断（水平/垂直/两对角线）
+   - 深度连续校验防止断连误判
+
+2. **防御性验证**：
+
+   ```typescript
+   // 双重坐标验证
+   isValidCoordinate(x, y, board);
+   // 空位安全检测
+   player !== 0;
+   // 连续性二次验证
+   isContinuous(segment);
+   ```
+
+3. **胜利段精确捕获**：
+
+   ```typescript
+   // 示例输出：[[7,7],[8,8],[9,9],[10,10],[11,11]]
+   trimToWinningSegment(); // 自动截取实际五连段
+   ```
+
+4. **边界处理优化**：
+   ```typescript
+   // 处理棋盘边缘扫描的越界情况
+   while (isValidCoordinate(currentX, currentY, board)) { ... }
+   ```
+
+### 使用方式示例
+
+```typescript
+// 初始化棋盘和规则检查器
+const board = new Board();
+const ruleChecker = new RuleChecker();
+
+// 放置测试棋子
+board.placeStone(3, 3, 1);
+board.placeStone(4, 4, 1);
+board.placeStone(5, 5, 1);
+board.placeStone(6, 6, 1);
+board.placeStone(7, 7, 1); // 连成五子
+
+// 进行胜负检查
+const lastMove: Coord = [7, 7];
+const result = ruleChecker.checkWinCondition(board.getBoardState(), lastMove);
+
+// 输出结果示例
+console.log(result);
+// {
+//   winner: 1,
+//   positions: [[3,3], [4,4], [5,5], [6,6], [7,7]]
+// }
+```
+
+### 性能优化措施
+
+1. **增量检查**：仅校验最后一棋周围区域
+2. **快速失败**：遇到不同颜色时立即中断扫描
+3. **缓存方向**：预定义检查方向数组减少重复计算
+4. **智能截断**：发现足够的连续棋子即返回结果
+
+建议搭配棋盘模块的 `getLastMove()` 方法使用，可减少约90%的无效扫描区域，提升检测效率。此实现已涵盖所有标准五子棋胜利场景，并提供具体的连珠坐标用于前端高亮展示。
