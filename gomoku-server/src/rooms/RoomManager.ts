@@ -163,6 +163,12 @@ export class RoomManager {
   public getRooms() {
     return this.rooms;
   }
+
+  public cleanUpAllRooms(): void {
+    this.rooms.forEach((room, roomId) => {
+      this.destroyRoom(roomId);
+    });
+  }
 }
 
 export const roomManager = new RoomManager();

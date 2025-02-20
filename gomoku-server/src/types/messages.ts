@@ -71,6 +71,7 @@ export interface HeartbeatMessage {
  ********************/
 export type ServerMessage =
   | WelcomeMessage
+  | SystemMessage
   | RoomCreatedMessage
   | JoinSuccessMessage
   | ErrorMessage
@@ -91,6 +92,13 @@ export interface BaseServerMessage {
 export interface WelcomeMessage extends BaseServerMessage {
   type: "welcome";
   message: string;
+}
+
+// 系统消息
+export interface SystemMessage extends BaseServerMessage {
+  type: "system";
+  message: string;
+  code: string;
 }
 
 // 房间创建成功
