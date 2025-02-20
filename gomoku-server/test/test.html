@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Test Page</title>
+</head>
+<body>
+    <h1>WebSocket Test Page</h1>
+    <button id="connect">Connect</button>
+    <button id="disconnect" disabled>Disconnect</button>
+    <button id="sendMessage" disabled>Send Message</button>
+    <input type="text" id="messageInput" placeholder="Message" disabled>
+    <ul id="messages"></ul>
+
+    <script>
+        const connectButton = document.getElementById('connect');
+        const disconnectButton = document.getElementById('disconnect');
+        const sendMessageButton = document.getElementById('sendMessage');
+        const messageInput = document.getElementById('messageInput');
+        const messagesList = document.getElementById('messages');
+
+        let ws;
+
+        connectButton.addEventListener('click', () => {
+            ws = new WebSocket('ws://localhost:3030');
+
+            ws.onopen = () => {
+                console.log('Connected to the server');
+                connectButton.disabled = true;
+                disconnectButton.disabled = false;
+                sendMessageButton.disabled = false;
+                messageInput.disabled = false;
+
+                messagesList.appendChild(createMessageItem('Connected to the server'));
+            };
+
+            ws.onmessage = (event) => {
+                console.log('Received message:', event.data);
+                messagesList.appendChild(createMessageItem(`Server: ${event.data}`));
+            };
+
+            ws.onclose = () => {
+                console.log('Disconnected from the server');
+                connectButton.disabled = false;
+                disconnectButton.disabled = true;
+                sendMessageButton.disabled = true;
+                messageInput.disabled = true;
+
+                messagesList.appendChild(createMessageItem('Disconnected from the server'));
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                messagesList.appendChild(createMessageItem(`WebSocket error: ${error.message}`));
+            };
+        });
+
+        disconnectButton.addEventListener('click', () => {
+            ws.close();
+        });
+
+        sendMessageButton.addEventListener('click', () => {
+            const message = messageInput.value;
+            ws.send(JSON.stringify({ type: 'test', data: message }));
+            messagesList.appendChild(createMessageItem(`Client: ${message}`));
+            messageInput.value = '';
+        });
+
+        function createMessageItem(text) {
+            const item = document.createElement('li');
+            item.textContent = text;
+            return item;
+        }
+    </script>
+</body>
+</html>

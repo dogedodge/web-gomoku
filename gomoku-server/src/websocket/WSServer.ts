@@ -12,6 +12,9 @@ export class WSServer {
 
   private setupHandlers() {
     this.wss.on("connection", (ws) => {
+      ws.send("Welcome to the WebSocket server!");
+      console.log("Client connected");
+
       ws.on("message", (raw) => {
         const message = raw.toString();
         this.handleMessage(message, ws);
