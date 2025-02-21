@@ -1,9 +1,9 @@
-import { GoState } from "../constant";
-import { placeGo } from "../store/gameSlice";
+import { StoneState } from "../constant";
+import { placeStone } from "../store/gameSlice";
 import { useAppDispatch } from "../store/hooks";
 
-interface GoProps {
-  state: GoState;
+interface StoneProps {
+  state: StoneState;
   size: number;
   cx: number;
   cy: number;
@@ -11,15 +11,15 @@ interface GoProps {
   yIndex: number;
 }
 
-export function Go(props: GoProps) {
+export function Stone(props: StoneProps) {
   const { state, size, cx, cy, xIndex, yIndex } = props;
 
   const dispatch = useAppDispatch();
 
   const fill =
-    state === GoState.BLACK
+    state === StoneState.BLACK
       ? "black"
-      : state === GoState.WHITE
+      : state === StoneState.WHITE
         ? "white"
         : "transparent";
 
@@ -27,7 +27,7 @@ export function Go(props: GoProps) {
 
   function onClick() {
     // console.log(`click ${cx} ${cy}`);
-    dispatch(placeGo({ x: xIndex, y: yIndex }));
+    dispatch(placeStone({ x: xIndex, y: yIndex }));
   }
 
   return (
@@ -39,7 +39,7 @@ export function Go(props: GoProps) {
         r={r}
         fill={fill}
         stroke="black"
-        strokeWidth={state === GoState.NONE ? 0 : 2}
+        strokeWidth={state === StoneState.NONE ? 0 : 2}
       ></circle>
     </>
   );

@@ -1,10 +1,10 @@
-import { Board, GoState } from "../constant";
+import { Board, StoneState } from "../constant";
 
 export function checkWinner(
   board: Board,
   row: number,
   col: number,
-  player: GoState,
+  player: StoneState,
 ): boolean {
   if (!player) return false;
 

@@ -1,9 +1,9 @@
-export enum GoState {
+export enum StoneState {
   NONE,
   BLACK,
   WHITE,
 }
 
-export type Board = number[][];
+export type Board = StoneState[][];
 
 export const BOARD_SIZE = 15;

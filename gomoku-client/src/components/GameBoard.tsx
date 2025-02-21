@@ -1,17 +1,17 @@
 import { BOARD_SIZE } from "../constant";
 import { useAppSelector } from "../store/hooks";
-import { Go } from "./Go";
+import { Stone } from "./Stone";
 
-interface GoBoardProps {
+interface GameBoardProps {
   size: number; // width & height in pixcel
   gridStrokeWidth: number;
 }
 
-export function GoBoard(props: GoBoardProps) {
+export function GameBoard(props: GameBoardProps) {
   const { size, gridStrokeWidth } = props;
-  const goStateMap = useAppSelector((state) => state.game.goStateMap);
+  const board = useAppSelector((state) => state.game.board);
 
-  const goSize = size / 15;
+  const stoneSize = size / 15;
 
   const lines: JSX.Element[] = [];
 
@@ -20,10 +20,10 @@ export function GoBoard(props: GoBoardProps) {
     lines.push(
       <line
         key={`h${i}`}
-        x1={goSize * 0.5}
-        y1={goSize * (0.5 + i)}
-        x2={size - goSize * 0.5}
-        y2={goSize * (0.5 + i)}
+        x1={stoneSize * 0.5}
+        y1={stoneSize * (0.5 + i)}
+        x2={size - stoneSize * 0.5}
+        y2={stoneSize * (0.5 + i)}
         stroke="black"
         strokeWidth={gridStrokeWidth}
       ></line>,
@@ -33,31 +33,31 @@ export function GoBoard(props: GoBoardProps) {
     lines.push(
       <line
         key={`v${i}`}
-        x1={goSize * (0.5 + i)}
-        y1={goSize * 0.5}
-        x2={goSize * (0.5 + i)}
-        y2={size - goSize * 0.5}
+        x1={stoneSize * (0.5 + i)}
+        y1={stoneSize * 0.5}
+        x2={stoneSize * (0.5 + i)}
+        y2={size - stoneSize * 0.5}
         stroke="black"
         strokeWidth={gridStrokeWidth}
       ></line>,
     );
   }
 
-  const goList: JSX.Element[] = [];
+  const stoneList: JSX.Element[] = [];
   for (let i = 0; i < BOARD_SIZE; i++) {
     for (let j = 0; j < BOARD_SIZE; j++) {
-      const cx = (0.5 + i) * goSize;
-      const cy = (0.5 + j) * goSize;
-      goList.push(
-        <Go
+      const cx = (0.5 + i) * stoneSize;
+      const cy = (0.5 + j) * stoneSize;
+      stoneList.push(
+        <Stone
           key={`${i}-${j}`}
           cx={cx}
           cy={cy}
           xIndex={i}
           yIndex={j}
-          size={goSize}
-          state={goStateMap[i][j]}
-        ></Go>,
+          size={stoneSize}
+          state={board[i][j]}
+        ></Stone>,
       );
     }
   }
@@ -66,7 +66,7 @@ export function GoBoard(props: GoBoardProps) {
     <svg width={size} height={size}>
       <rect width={size} height={size} fill="white"></rect>
       {lines}
-      {goList}
+      {stoneList}
     </svg>
   );
 }

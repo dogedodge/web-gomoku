@@ -2,7 +2,7 @@
 // import reactLogo from "./assets/react.svg";
 // import viteLogo from "/vite.svg";
 import "./App.css";
-import { GoBoard } from "./components/GoBoard";
+import { GameBoard } from "./components/GameBoard";
 import { Provider } from "react-redux";
 import { store } from "./store/store";
 import { Popup } from "./components/Popup";
@@ -13,7 +13,7 @@ function App() {
   return (
     <>
       <Provider store={store}>
-        <GoBoard size={400} gridStrokeWidth={2}></GoBoard>
+        <GameBoard size={400} gridStrokeWidth={2}></GameBoard>
         <Popup></Popup>
       </Provider>
       {/* <div>
