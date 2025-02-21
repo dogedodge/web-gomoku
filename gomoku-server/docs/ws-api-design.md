@@ -62,6 +62,32 @@
 }
 ```
 
+#### 显示房间列表
+
+```json
+// Client -> Server
+{
+  "type": "get_room_list"
+}
+
+// Server -> Client
+{
+  "type": "room_list",
+  "rooms": [
+    {
+      "room_id": "5XQ9L",
+      "player_count": 1,
+      "expire_time": 1800
+    },
+    {
+      "room_id": "7YR3M",
+      "player_count": 2,
+      "expire_time": 1200
+    }
+  ]
+}
+```
+
 ---
 
 ### **3. 游戏流程**

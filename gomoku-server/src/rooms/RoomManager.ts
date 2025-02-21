@@ -2,17 +2,17 @@
 import { GameRoom } from "./GameRoom";
 import { ServerMessage, PlayerID, ErrorCode } from "../types/messages";
 import { WebSocket } from "ws";
-// import { v4 as uuidv4 } from "uuid";
-
 const ROOM_CLEANUP_INTERVAL = 30 * 60 * 1000; // 30分钟清理一次
 const MAX_INACTIVE_TIME = 60 * 60 * 1000; // 1小时无活动销毁
 const ROOM_ID_LENGTH = 4; // 4位房间号
 
 export class RoomManager {
-  private rooms = new Map<string, GameRoom>();
+  // 承载房间的私有属性
+  private roomMap: Map<string, GameRoom>;
   private playerRoomMap = new Map<PlayerID, string>();
 
   constructor() {
+    this.roomMap = new Map();
     this.startCleanupTimer();
   }
 
@@ -20,7 +20,7 @@ export class RoomManager {
   createRoom(roomSize = 15): { roomId: string; room: GameRoom } {
     const roomId = this.generateUniqueRoomId();
     const room = new GameRoom(roomId, roomSize);
-    this.rooms.set(roomId, room);
+    this.roomMap.set(roomId, room);
     return { roomId, room };
   }
 
@@ -31,7 +31,7 @@ export class RoomManager {
     ws: WebSocket,
     playerName: string,
   ): { role: "black" | "white"; room: GameRoom } | { error: ServerMessage } {
-    const room = this.rooms.get(roomId);
+    const room = this.roomMap.get(roomId);
     if (!room) {
       return { error: this.createError("ROOM_NOT_FOUND", "房间不存在") };
     }
@@ -55,7 +55,7 @@ export class RoomManager {
     const roomId = this.playerRoomMap.get(playerId);
     if (!roomId) return;
 
-    const room = this.rooms.get(roomId);
+    const room = this.roomMap.get(roomId);
     if (!room) return;
 
     // 通知房间处理断线
@@ -73,7 +73,7 @@ export class RoomManager {
     players: number;
     status: "waiting" | "playing" | "ended";
   } | null {
-    const room = this.rooms.get(roomId);
+    const room = this.roomMap.get(roomId);
     if (!room) return null;
 
     return {
@@ -96,7 +96,7 @@ export class RoomManager {
   // 清理不活跃房间
   private cleanupInactiveRooms(): void {
     const now = Date.now();
-    for (const [roomId, room] of this.rooms) {
+    for (const [roomId, room] of this.roomMap) {
       if (now - room.getLastActivity() > MAX_INACTIVE_TIME) {
         this.destroyRoom(roomId);
       }
@@ -108,7 +108,7 @@ export class RoomManager {
     let id: string;
     do {
       id = this.generateRoomId();
-    } while (this.rooms.has(id));
+    } while (this.roomMap.has(id));
     return id;
   }
 
@@ -119,11 +119,11 @@ export class RoomManager {
 
   // 销毁房间
   private destroyRoom(roomId: string): void {
-    const room = this.rooms.get(roomId);
+    const room = this.roomMap.get(roomId);
     if (!room) return;
 
     room.cleanup();
-    this.rooms.delete(roomId);
+    this.roomMap.delete(roomId);
 
     // 清理玩家映射
     for (const [playerId, id] of this.playerRoomMap) {
@@ -143,8 +143,7 @@ export class RoomManager {
   }
 
   private getPlayerCount(roomId: string): number {
-    const room = this.rooms.get(roomId);
-    // return room ? (room.players.black ? 1 : 0) + (room.players.white ? 1 : 0) : 0;
+    const room = this.roomMap.get(roomId);
     return room ? room.getPlayerCount() : 0;
   }
 
@@ -160,15 +159,17 @@ export class RoomManager {
     }, 5000); // 5秒后再次检查
   }
 
-  public getRooms() {
-    return this.rooms;
+  public getRoomMap() {
+    return this.roomMap;
+  }
+
+  public listRooms(): GameRoom[] {
+    return Array.from(this.roomMap.values());
   }
 
   public cleanUpAllRooms(): void {
-    this.rooms.forEach((room, roomId) => {
+    this.roomMap.forEach((room, roomId) => {
       this.destroyRoom(roomId);
     });
   }
 }
-
-// export const roomManager = new RoomManager();

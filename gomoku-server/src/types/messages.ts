@@ -11,14 +11,6 @@ export type PlayerRole = "black" | "white";
 /********************
  * 客户端发送消息类型
  ********************/
-export type ClientMessage =
-  | CreateRoomMessage
-  | JoinRoomMessage
-  | PlaceStoneMessage
-  | RequestUndoMessage
-  | RespondUndoMessage
-  | HeartbeatMessage;
-
 export interface BaseClientMessage {
   type: string;
   roomId?: string; // 大部分操作需要房间ID
@@ -66,23 +58,23 @@ export interface HeartbeatMessage {
   type: "ping";
 }
 
+// 新增客户端请求房间列表的消息类型声明
+export interface GetRoomListMessage extends BaseClientMessage {
+  type: "get_room_list";
+}
+
+// 更新 ClientMessage 类型
+export type ClientMessage =
+  | CreateRoomMessage
+  | JoinRoomMessage
+  | PlaceStoneMessage
+  | RequestUndoMessage
+  | RespondUndoMessage
+  | HeartbeatMessage
+  | GetRoomListMessage;
 /********************
  * 服务端发送消息类型
  ********************/
-export type ServerMessage =
-  | WelcomeMessage
-  | SystemMessage
-  | RoomCreatedMessage
-  | JoinSuccessMessage
-  | ErrorMessage
-  | GameStartMessage
-  | StonePlacedMessage
-  | GameOverMessage
-  | UndoRequestedMessage
-  | FullStateMessage
-  | OpponentLeftMessage
-  | HeartbeatResponseMessage;
-
 export interface BaseServerMessage {
   type: string;
   timestamp?: number; // 可选时间戳
@@ -107,7 +99,6 @@ export interface RoomCreatedMessage extends BaseServerMessage {
   roomId: string;
   playerId: PlayerID;
   role: PlayerRole;
-  // expire_time: number;
 }
 
 // 加入房间成功
@@ -115,7 +106,6 @@ export interface JoinSuccessMessage extends BaseServerMessage {
   type: "join_success";
   playerId: PlayerID;
   roomId: string;
-  // opponent_name: string;
   role: PlayerRole;
 }
 
@@ -150,7 +140,6 @@ export interface GameStartMessage extends BaseServerMessage {
 // 落子广播
 export interface StonePlacedMessage extends BaseServerMessage {
   type: "stone_placed";
-  // roomId: string;
   playerId: PlayerID;
   position: Coord;
   next_turn: PlayerID | null;
@@ -196,6 +185,32 @@ export interface HeartbeatResponseMessage extends BaseServerMessage {
   type: "pong";
   timestamp: number;
 }
+
+// 新增服务器返回房间列表的消息类型声明
+export interface RoomListMessage extends BaseServerMessage {
+  type: "room_list";
+  rooms: Array<{
+    id: string;
+    playerCount: number;
+    // expire_time: number;
+  }>;
+}
+
+// 更新 ServerMessage 类型以包含 RoomListMessage
+export type ServerMessage =
+  | WelcomeMessage
+  | SystemMessage
+  | RoomCreatedMessage
+  | JoinSuccessMessage
+  | ErrorMessage
+  | GameStartMessage
+  | StonePlacedMessage
+  | GameOverMessage
+  | UndoRequestedMessage
+  | FullStateMessage
+  | OpponentLeftMessage
+  | HeartbeatResponseMessage
+  | RoomListMessage; // 新增
 
 /********************
  * 辅助类型

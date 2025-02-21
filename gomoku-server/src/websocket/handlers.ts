@@ -11,6 +11,7 @@ import {
   ErrorMessage,
   PlaceStoneMessage,
   ErrorCode,
+  RoomListMessage,
 } from "../types/messages";
 import { v4 as uuidv4 } from "uuid";
 
@@ -59,6 +60,11 @@ export class GameWebSocketHandler {
 
         case "place_stone":
           await this.handlePlayerMove(ws, message, ctx);
+          break;
+
+        // 新增部分
+        case "get_room_list":
+          await this.handleGetRoomList(ws);
           break;
 
         // case "reconnect":
@@ -258,8 +264,24 @@ export class GameWebSocketHandler {
     return `player_${uuidv4().substr(0, 8)}`;
   }
 
+  // 新增 get_room_list 处理函数
+  private async handleGetRoomList(ws: WebSocket) {
+    const rooms = this.roomManager.listRooms().map((room) => ({
+      id: room.id,
+      playerCount: room.getPlayerCount(),
+      // expire_time: room.expireTime // Assuming there is an expireTime property in the GameRoom
+    }));
+
+    const response: RoomListMessage = {
+      type: "room_list",
+      rooms,
+    };
+
+    this.send(ws, response);
+  }
+
   // 类型守卫
   private get rooms() {
-    return this.roomManager.getRooms();
+    return this.roomManager.getRoomMap();
   }
 }

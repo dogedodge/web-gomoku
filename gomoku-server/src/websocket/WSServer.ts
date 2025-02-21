@@ -151,7 +151,7 @@ export class WSServer {
   get serverStatus() {
     return {
       connections: this.wss.clients.size,
-      rooms: this.roomManager.getRooms().size,
+      rooms: this.roomManager.getRoomMap().size,
       uptime: process.uptime(),
     };
   }
