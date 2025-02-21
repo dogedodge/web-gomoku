@@ -9,36 +9,6 @@ graph TD
     B --> D[异常流处理]
     C --> D
     B --> E[增强功能]
-
-    subgraph 基础设施
-        A1[Redux store]
-        A2[WebSocket Middleware]
-        A3[网络状态管理]
-    end
-
-    subgraph 核心游戏流程
-        B1[棋盘内核组件]
-        B2[游戏状态管理]
-        B3[联机对战主界面]
-    end
-
-    subgraph 联机房间系统
-        C1[房间管理Slice]
-        C2[房间操作组件]
-        C3[用户标识系统]
-    end
-
-    subgraph 异常流处理
-        D1[断线重连系统]
-        D2[游戏异常处理]
-        D3[状态恢复策略]
-    end
-
-    subgraph 增强功能
-        E1[性能优化]
-        E2[动画系统]
-        E3[观战模式]
-    end
 ```
 
 ### 二、推荐开发顺序
