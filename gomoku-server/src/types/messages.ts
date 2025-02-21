@@ -132,9 +132,9 @@ export interface ErrorMessage extends BaseServerMessage {
 // 游戏开始通知
 export interface GameStartMessage extends BaseServerMessage {
   type: "game_start";
-  black_player: string;
-  white_player: string;
-  current_turn: PlayerID;
+  blackPlayer: string;
+  whitePlayer: string;
+  currentTurn: PlayerID;
 }
 
 // 落子广播
@@ -142,8 +142,8 @@ export interface StonePlacedMessage extends BaseServerMessage {
   type: "stone_placed";
   playerId: PlayerID;
   position: Coord;
-  next_turn: PlayerID | null;
-  board_state?: string; // 可选压缩棋盘状态
+  nextTurn: PlayerID | null;
+  boardState?: string; // 可选压缩棋盘状态
 }
 
 // 游戏结束
@@ -152,8 +152,8 @@ export type WinReason = "FIVE_IN_ROW" | "RESIGNATION" | "DRAW" | "TIMEOUT";
 export interface GameOverMessage extends BaseServerMessage {
   type: "game_over";
   winner: PlayerID | null;
-  win_reason: WinReason;
-  win_positions?: Coord[]; // 五连珠的具体坐标
+  winReason: WinReason;
+  winPositions?: Coord[]; // 五连珠的具体坐标
 }
 
 // 悔棋请求通知
@@ -165,9 +165,9 @@ export interface UndoRequestedMessage extends BaseServerMessage {
 // 完整状态同步（重连用）
 export interface FullStateMessage extends BaseServerMessage {
   type: "full_state";
-  current_turn: PlayerID;
+  currentTurn: PlayerID;
   board: Array<Array<0 | 1 | 2>>; // 0:空 1:黑 2:白
-  move_history: Array<{
+  moveHistory: Array<{
     player: PlayerID;
     position: Coord;
     timestamp: number;
@@ -192,7 +192,7 @@ export interface RoomListMessage extends BaseServerMessage {
   rooms: Array<{
     id: string;
     playerCount: number;
-    // expire_time: number;
+    // expireTime: number;
   }>;
 }
 
