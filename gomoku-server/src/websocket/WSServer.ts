@@ -120,9 +120,9 @@ export class WSServer {
         this.roomManager.cleanUpAllRooms();
 
         // 关闭HTTP服务器
-        await new Promise<void>((resolve) =>
-          this.httpServer?.close(() => resolve()),
-        );
+        // await new Promise<void>((resolve) =>
+        //   this.httpServer?.close(() => resolve()),
+        // );
 
         console.log("Server shutdown complete");
         process.exit(0);
