@@ -121,8 +121,8 @@ export class GameRoom {
         type: "stone_placed",
         playerId,
         position,
-        next_turn: winResult ? null : nextTurn,
-        board_state: this.board.getCompressedState(),
+        nextTurn: winResult ? null : nextTurn,
+        boardState: this.board.getCompressedState(),
       });
 
       // 处理游戏结束
@@ -141,9 +141,9 @@ export class GameRoom {
   getFullState(): ServerMessage {
     return {
       type: "full_state",
-      current_turn: this.getCurrentPlayer()?.id || "",
+      currentTurn: this.getCurrentPlayer()?.id || "",
       board: this.board.getBoardState(),
-      move_history: [...this.moveHistory],
+      moveHistory: [...this.moveHistory],
     };
   }
 
@@ -160,9 +160,9 @@ export class GameRoom {
     this.gameStarted = true;
     this.broadcast({
       type: "game_start",
-      black_player: this.players.black!.name,
-      white_player: this.players.white!.name,
-      current_turn: this.players.black!.id,
+      blackPlayer: this.players.black!.name,
+      whitePlayer: this.players.white!.name,
+      currentTurn: this.players.black!.id,
     });
   }
 
@@ -172,8 +172,8 @@ export class GameRoom {
     this.broadcast({
       type: "game_over",
       winner: winnerId,
-      win_reason: "FIVE_IN_ROW",
-      win_positions: winResult!.positions,
+      winReason: "FIVE_IN_ROW",
+      winPositions: winResult!.positions,
     });
     this.isGameEnded = true;
     this.cleanup();
