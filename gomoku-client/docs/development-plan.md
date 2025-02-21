@@ -1,117 +1,194 @@
-根据架构设计方案，我为你制定以下研发计划，包含模块依赖顺序及开发阶段划分：
+根据架构设计和组件依赖关系，以下是推荐的开发顺序策略和核心路径规划：
 
-### 阶段一：基础框架搭建 (3-5天)
-
-```markdown
-1. 类型系统构建
-
-   - ✅ 完成 `types.ts` 全局类型定义
-   - ✅ 配置严格 TypeScript 编译选项
-
-2. 核心状态管理 (store/)
-
-   - ✅ 实现基础 store 结构
-   - ✅ 完成 gameSlice.ts 核心逻辑（棋盘同步机制）
-   - ✅ 开发 networkSlice.ts 网络状态管理
-   - ➡️ 房间功能暂用 Mock 数据
-
-3. WebSocket 中间件
-   - ✅ 完成事件分发系统
-   - ✅ 集成类型校验守卫
-```
-
-### 阶段二：联机功能核心链路 (5-7天)
-
-```markdown
-1. 房间系统开发 (features/online/)
-
-   - ✅ RoomFormModal 房间创建/加入表单
-   - ✅ 对接 roomSlice.ts 状态管理
-   - ✅ 实现 WS 服务器交互验证
-
-2. 游戏主战场 (game/)
-
-   - ✅ 升级 Board.tsx 支持联机模式
-   - ✅ 封装 GamePage.tsx 双模式切换能力
-   - ✅ 集成序列号同步校验机制
-
-3. 协议开发
-   - ✅ 实现 ROOM_UPDATE 消息处理
-   - ✅ 完成 SYNC 消息类型双向同步
-```
-
-### 阶段三：体验优化阶段 (3-4天)
-
-```markdown
-1. 重连机制增强
-
-   - ✅ 开发 ReconnectModal.tsx 重连弹窗
-   - ✅ 完善 networkSlice.ts 的断线检测
-   - ✅ WebSocket 心跳机制
-
-2. 模式选择集成 (game/ModeSelect.tsx)
-
-   - ✅ 单机模式快速开始
-   - ✅ 联机入口跳转
-
-3. 联动调试
-   - ✅ 创建房间 => 开始对战完整流程
-   - ✅ 异常流程测试（断网/挤号等场景）
-```
-
-### 阶段四：安全加固与交付 (2-3天)
-
-```markdown
-1. 类型保护增强
-
-   - ✅ 核心组件的 memo 优化
-   - ✅ 完善类型守卫函数
-
-2. 工程化收尾
-   - ✅ 全局类型导出检查
-   - ✅ 禁用 any 类型扫描
-   - ✅ Storybook 可视化测试
-```
-
-### 关键依赖路径
+### 一、依赖关系分析
 
 ```mermaid
 graph TD
-    A[types.ts] --> B[store/slices]
-    B --> C[websocketMiddleware]
-    C --> D[features/online]
-    D --> E[game/Board]
-    C --> E
-    B --> F[reconnectLogic]
-    E --> G[ModeSelect]
+    A[基础设施] --> B[核心游戏流程]
+    A --> C[联机房间系统]
+    B --> D[异常流处理]
+    C --> D
+    B --> E[增强功能]
+
+    subgraph 基础设施
+        A1[Redux store]
+        A2[WebSocket Middleware]
+        A3[网络状态管理]
+    end
+
+    subgraph 核心游戏流程
+        B1[棋盘内核组件]
+        B2[游戏状态管理]
+        B3[联机对战主界面]
+    end
+
+    subgraph 联机房间系统
+        C1[房间管理Slice]
+        C2[房间操作组件]
+        C3[用户标识系统]
+    end
+
+    subgraph 异常流处理
+        D1[断线重连系统]
+        D2[游戏异常处理]
+        D3[状态恢复策略]
+    end
+
+    subgraph 增强功能
+        E1[性能优化]
+        E2[动画系统]
+        E3[观战模式]
+    end
 ```
 
-### 研发策略建议
+### 二、推荐开发顺序
 
-1. **并行开发**：类型系统与 store 开发同步进行，确保后续组件构建时有可用状态管理
-2. **协议优先**：先定义清楚前端的所有 WS 消息体，生成 `.d.ts` 供联调使用
-3. **Mock 策略**：
-   ```typescript
-   // 可用于前期开发阶段
-   export const mockRoomState: RoomState = {
-     players: [{ id: "bot_1", name: "AI", role: "guest", ready: true }],
-     status: "waiting",
-     roomCode: "TEST",
-   };
-   ```
-4. **组件驱动**：
-   - 优先保证 GamePage → Board 的最小可玩性
-   - 联机功能开发时保留单机模式快速入口
+#### 阶段1：基础设施搭建（2-3天）
 
-需特别注意 `RoomFormModal` 与 `websocketMiddleware` 的联调时序，建议在建立 WS 连接前实现状态预校验逻辑：
+```
+1. Redux store基础配置
+   - 完成rootReducer组合
+   - 配置websocketMiddleware
+   - 基础类型定义（types/wsMessage.ts）
+
+2. 网络层基础设施
+   - 实现WebSocket连接管理器（services/websocket.ts）
+   - 完成心跳检测机制
+   - 网络状态Slice开发（features/network/）
+
+3. 公共能力模块
+   - 棋盘工具类（boardUtils.ts）
+   - WebSocket自定义Hook骨架（useWebSocket.ts）
+```
+
+#### 阶段2：核心游戏流程（5-7天）
+
+```
+1. 棋盘内核组件
+   - BoardGrid组件（纯UI渲染）
+   - Stone落子动画组件
+   - 胜负判定算法（checkWin.ts）
+
+2. 游戏状态管理
+   - gameSlice完整实现
+   - 棋盘数据同步Thunks（syncThunks.ts）
+   - 落子操作与状态更新联动
+
+3. 联机对战主界面
+   - OnlineBoard容器组件
+   - 实现props与redux-store的连接
+   - Action与WS消息的转换处理
+```
+
+#### 阶段3：联机房间系统（3-5天）
+
+```
+1. 房间管理Slice
+   - roomSlice状态定义
+   - 房间列表更新机制
+
+2. 房间操作组件
+   - CreateRoomForm表单逻辑
+   - RoomList动态渲染
+   - JoinRoom表单验证
+
+3. 用户标识系统
+   - 用户临时ID生成（cookies/localStorage）
+   - userSlice基础功能
+```
+
+#### 阶段4：异常流处理（2-3天）
+
+```
+1. 断线重连系统
+   - 重试策略管理（reconnectManager.ts）
+   - 离线状态检测Hook（useReconnect.ts）
+   - ReconnectModal视觉反馈
+
+2. 游戏异常处理
+   - UndoRequestDialog协商机制
+   - 超时自动投降逻辑
+   - 非法操作拦截系统
+```
+
+#### 阶段5：增强功能（穿插进行）
+
+```
+1. 性能优化（棋盘memoization、AI worker）
+2. 动画增强系统（落子涟漪、胜利高亮）
+3. 观战模式支持
+```
+
+### 三、关键路径说明
+
+1. **WebSocket与Redux联动**（高优先级）
 
 ```typescript
-// RoomFormModal.tsx 的提交处理逻辑
-const handleCreate = () => {
-  if (!navigator.onLine) {
-    dispatch(setNetworkStatus("offline"));
-    return;
+// 示例代码：消息类型安全处理
+const handleMessage = (msg: WSMessage, store: Store) => {
+  if (isGameStartMessage(msg)) {
+    store.dispatch(gameStart(msg.players));
+    store.dispatch(navigate("/game")); // 路由跳转
   }
-  onCreateRoom(formValues);
 };
 ```
+
+2. **棋盘数据流优化**（性能关键）
+
+```text
+操作流程：
+用户点击 -> 验证合法 -> WS发送 -> 乐观更新 -> 确认广播 -> Redux更新 -> 渲染优化
+```
+
+```typescript
+// 使用CSS transform代替位置重排
+const Stone = memo(({ x, y }: Position) => (
+  <div
+    className="stone"
+    style={{
+      transform: `translate(${x * 100}%, ${y * 100}%)`,
+      transition: 'transform 0.2s ease-out'
+    }}
+  />
+))
+```
+
+3. **重连恢复策略**（鲁棒性保障）
+
+```javascript
+// 重连处理流程
+检测断线 -> 展示Modal -> 启动计时器 ->
+  尝试重连 -> 成功: 请求全量状态 / 失败: 退回大厅
+```
+
+### 四、开发建议
+
+1. **状态隔离策略**：建议按照功能切片进行分组开发（棋盘组、联机组、网络组）
+
+2. **UI先行开发**：
+
+```bash
+# 使用Storybook启动组件驱动开发
+npm run storybook
+```
+
+```typescript
+// Board.stories.tsx 示例
+export const DefaultBoard = () => (
+  <BoardGrid size={15}>
+    <Stone x={7} y={7} color="black" />
+  </BoardGrid>
+)
+```
+
+3. **调试工具链配置**：
+
+```javascript
+// 推荐在store中使用Redux DevTools增强
+const store = configureStore({
+  middleware: [websocketMiddleware, logger],
+  devTools: process.env.NODE_ENV !== "production",
+});
+```
+
+建议采用里程碑式开发模式，每完成一个阶段立即进行集成测试，确保消息流与状态变更的正确性，尤其关注棋盘操作与WebSocket消息之间的时序处理。

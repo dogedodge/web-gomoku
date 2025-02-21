@@ -1,247 +1,294 @@
-### 前端架构设计方案 (TypeScript)
+根据技术需求和API设计，以下是前端架构规划及组件/Redux结构设计：
 
-#### 1. 组件结构树（类型增强）
+### 前端架构规划
 
-```typescript
+1. **WebSocket集成方案**
+
+   - 使用`redux-websocket`中间件或自定义中间件管理双工通信
+   - 设计MessageType类型守卫处理不同协议消息
+
+2. **状态管理设计原则**
+
+   - 全局状态选择器优先
+   - 棋盘数据使用不可变更新
+   - 网络状态与业务状态分离
+
+3. **关键性能优化**
+   - 棋盘渲染使用React.memo
+   - 使用Web Workers处理AI计算（保留单机模式兼容）
+   - 心跳检测单独线程管理
+
+---
+
+### 项目结构树
+
+```markdown
 src/
-├─ features/
-│  ├─ online/
-│  │  ├─ LobbyPage.tsx      // 联机大厅
-│  │  ├─ RoomFormModal.tsx  // 创建/加入房间弹窗
-│  │  └─ ReconnectModal.tsx
-├─ game/
-│  ├─ Board.tsx           // 棋盘组件（复用单机版）
-│  ├─ GamePage.tsx        // 核心对战界面
-│  └─ ModeSelect.tsx      // 模式选择入口
-├─ store/
-│  ├─ websocketMiddleware.ts // WS通信中间件
-│  └─ slices/
-│     ├─ roomSlice.ts     // 房间状态管理
-│     ├─ gameSlice.ts     // 棋盘状态管理
-│     └─ networkSlice.ts  // 连接状态管理
-├─ types.ts
+├── app/
+│ ├── store.ts
+│ ├── hooks.ts
+│ └── rootReducer.ts
+├── components/
+│ ├── Home/
+│ │ ├── HomePage.tsx
+│ │ └── HomePage.module.scss
+│ ├── Lobby/
+│ │ ├── RoomList.tsx
+│ │ ├── CreateRoomForm.tsx
+│ │ └── JoinRoomForm.tsx
+│ ├── Game/
+│ │ ├── OnlineBoard.tsx
+│ │ ├── Stone.tsx
+│ │ └── BoardGrid.tsx
+│ ├── Modals/
+│ │ ├── ReconnectModal.tsx
+│ │ ├── GameOverDialog.tsx
+│ │ └── UndoRequestDialog.tsx
+│ └── common/
+│ ├── Header.tsx
+│ └── LoadingSpinner.tsx
+├── features/
+│ ├── network/
+│ │ ├── networkSlice.ts
+│ │ └── websocketMiddleware.ts
+│ ├── room/
+│ │ └── roomSlice.ts
+│ ├── game/
+│ │ ├── gameSlice.ts
+│ │ └── syncThunks.ts
+│ └── user/
+│ └── userSlice.ts
+├── hooks/
+│ ├── useWebSocket.ts
+│ └── useReconnect.ts
+├── utils/
+│ ├── boardUtils.ts
+│ ├── checkWin.ts
+│ ├── reconnectManager.ts
+│ └── dataSerializers.ts
+├── types/
+│ ├── wsMessage.ts
+│ └── apiResponses.ts
+├── constants/
+│ └── game.ts
+├── assets/
+│ ├── styles/
+│ │ ├── global.scss
+│ │ └── variables.scss
+│ └── icons/
+├── services/
+│ ├── api.ts
+│ └── websocket.ts
+├── stories/
+│ ├── HomePage.stories.tsx
+│ └── Board.stories.tsx
+├── test-utils.tsx
+├── App.tsx
+└── main.tsx
 ```
 
-#### 2. 类型化核心组件接口
+---
+
+### UI组件列表（按功能模块）
+
+#### 1. 入口组件
 
 ```typescript
-// RoomFormModal.tsx
-type RoomMode = "create" | "join";
-
-interface RoomFormProps {
-  initialMode: RoomMode;
-  onCreateRoom: (config: { maxPlayers?: number; password?: string }) => void;
-  onJoinRoom: (roomId: string, password?: string) => void;
+// components/HomePage.tsx
+interface HomePageProps {
+  onSelectMode: (mode: "single" | "online") => void;
 }
-
-const RoomFormModal: React.FC<RoomFormProps> = ({
-  initialMode,
-  onCreateRoom,
-  onJoinRoom,
-}) => {
-  /* 实现 */
-};
-
-// websocketMiddleware.ts
-import { Middleware } from "@reduxjs/toolkit";
-
-const socketMiddleware: Middleware = (store) => (next) => (action) => {
-  if (action.type === "WS_SEND") {
-    const payload = action.payload as WsMessage;
-    socket.send(JSON.stringify(payload));
-  }
-  return next(action);
-};
-
-// roomSlice.ts
-interface RoomState {
-  players: PlayerInfo[];
-  status: "waiting" | "playing";
-  roomCode: string | null;
-}
-
-const initialState: RoomState = {
-  /* 初始化 */
-};
 ```
 
-#### 3. 类型安全的状态管理
+#### 2. 联机模块
 
 ```typescript
-// gameSlice.ts
-interface GameState {
-  board: (null | "black" | "white")[][];
-  currentPlayer: string;
-  sequence: number;
+// components/Lobby/RoomList.tsx
+interface RoomListProps {
+  rooms: Array<{
+    roomId: string;
+    playerCount: number;
+    expireTime: number;
+  }>;
+  onCreateRoom: () => void;
+  onJoinRoom: (roomId: string) => void;
 }
 
-interface SyncBoardAction {
-  board: GameState["board"];
-  sequence: number;
-  lastMove?: [number, number];
-}
-
-const gameSlice = createSlice({
-  name: "game",
-  initialState: {} as GameState,
-  reducers: {
-    syncBoard: (state, action: PayloadAction<SyncBoardAction>) => {
-      if (action.payload.sequence > state.sequence) {
-        // 增量更新逻辑
-      }
-    },
-  },
-});
-```
-
-#### 4. 强化通信协议类型
-
-```typescript
-// types.ts
-type WsMessageType = "SYNC" | "CHAT" | "ROOM_UPDATE";
-
-interface BaseWsMessage<T extends WsMessageType> {
-  type: T;
-  timestamp: number;
-  payload: object;
-}
-
-interface BoardSyncMessage extends BaseWsMessage<"SYNC"> {
-  payload: {
-    board: string[][];
-    currentPlayer: string;
-    sequence: number;
-  };
-}
-
-type WsMessage = BoardSyncMessage | RoomUpdateMessage | ChatMessage;
-```
-
-#### 5. 类型优化的棋盘组件
-
-```typescript
-// Board.tsx
-interface BoardProps {
-  boardState: GameState;
+// components/Game/OnlineBoard.tsx
+interface OnlineBoardProps {
+  boardState: number[][];
+  currentTurn: "1" | "2";
+  playerId: string;
   onPlaceStone: (pos: [number, number]) => void;
 }
-
-const Board: React.FC<BoardProps> = memo(
-  ({ boardState, onPlaceStone }) => {
-    // 渲染逻辑
-  },
-  (prevProps, nextProps) =>
-    prevProps.boardState.sequence === nextProps.boardState.sequence,
-);
-
-// 类型守卫函数
-const isMoveValid = (pos: unknown): pos is [number, number] => {
-  return (
-    Array.isArray(pos) &&
-    pos.length === 2 &&
-    typeof pos[0] === "number" &&
-    typeof pos[1] === "number"
-  );
-};
 ```
 
-#### 6. 增强的安全重连逻辑
+#### 3. 状态模态框
 
 ```typescript
-// networkSlice.ts
-interface ReconnectState {
-  lastRoomId?: string;
-  retryCount: number;
-  lastValidState?: GameState;
+// components/Modals/ReconnectModal.tsx
+interface ReconnectModalProps {
+  remainingTime: number;
+  onReconnect: () => void;
 }
 
-const reconnectLogic = createAsyncThunk<boolean, void, { state: RootState }>(
-  "network/reconnect",
-  async (_, { dispatch, getState }) => {
-    const { roomCode } = getState().room;
-    try {
-      const res = await rejoinRoom(roomCode!); // 非空断言需配合运行时校验
-      dispatch(roomSlice.actions.forceSync(res));
-      return true;
-    } catch (err) {
-      showErrorToast((err as Error).message);
-      return false;
+// components/Modals/GameOverDialog.tsx
+interface GameOverDialogProps {
+  winner: "1" | "2" | null;
+  winPositions: Array<[number, number]>;
+  onRematch: () => void;
+}
+```
+
+---
+
+### Redux Toolkit Slice设计
+
+#### 1. 网络连接Slice
+
+```typescript
+// slices/networkSlice.ts
+interface NetworkState {
+  isConnected: boolean;
+  lastPongTime: number;
+  reconnectAttempts: number;
+  latency: number;
+}
+```
+
+#### 2. 房间管理Slice
+
+```typescript
+// slices/roomSlice.ts
+interface RoomState {
+  currentRoom: {
+    id: string;
+    players: string[];
+    config: {
+      maxPlayers: number;
+      hasPassword: boolean;
+    };
+  } | null;
+  roomList: Array<{
+    id: string;
+    playerCount: number;
+    status: "waiting" | "playing";
+  }>;
+  playerId: string | null;
+}
+```
+
+#### 3. 游戏状态Slice
+
+```typescript
+// slices/gameSlice.ts
+interface GameState {
+  board: number[][]; // 15x15棋盘
+  currentTurn: "1" | "2";
+  moveHistory: Array<{
+    player: string;
+    position: [number, number];
+    timestamp: number;
+  }>;
+  gameStatus: "playing" | "ended" | "waiting";
+  winner: {
+    playerId: string;
+    winType: "five" | "timeout" | "resign";
+    positions: Array<[number, number]>;
+  } | null;
+}
+```
+
+#### 4. WebSocket消息处理Slice
+
+```typescript
+// slices/wsMiddleware.ts
+const wsMiddleware = (store: MiddlewareAPI) => {
+  const ws = new WebSocket(API_URL);
+
+  ws.onmessage = (event) => {
+    const message = parseMessage(event.data);
+
+    switch (message.type) {
+      case "stonePlaced":
+        store.dispatch(applyStone(message));
+        break;
+      case "fullState":
+        store.dispatch(syncGameState(message));
+        break;
+      // 处理其他协议类型...
     }
-  },
-);
+  };
+
+  return (next) => (action) => {
+    if (isWsAction(action)) {
+      ws.send(serializeAction(action));
+    }
+    return next(action);
+  };
+};
 ```
 
 ---
 
-### 类型系统增强说明
+### 关键技术实现点
 
-1. **全局类型定义**：
+1. **类型安全的协议处理**
 
 ```typescript
-// types.ts
-type PlayerRole = "host" | "guest";
-interface PlayerInfo {
-  id: string;
-  name: string;
-  role: PlayerRole;
-  ready: boolean;
-}
+// types/wsMessage.ts
+type WSMessage =
+  | { type: "stonePlaced"; position: [number, number] }
+  | { type: "gameStart"; blackPlayer: string; whitePlayer: string };
+// 其他消息类型...
 
-type GameStatus = "waiting_players" | "countdown" | "playing" | "finished";
+const isGameStartMessage = (
+  msg: WSMessage,
+): msg is Extract<WSMessage, { type: "gameStart" }> => msg.type === "gameStart";
 ```
 
-2. **Redux Toolkit 类型集成**：
+2. **棋盘状态优化更新**
 
 ```typescript
-// store.ts
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
-export const useAppDispatch = () => useDispatch<AppDispatch>();
+// reducers/gameSlice
+reducers: {
+  applyMove(state, action: PayloadAction<StonePlacedPayload>) {
+    return produce(state, draft => {
+      draft.board[action.payload.x][action.payload.y] = action.payload.player
+      draft.currentTurn = action.payload.nextTurn
+    })
+  }
+}
 ```
 
-3. **WebSocket 事件类型守卫**：
+3. **断线重连机制**
 
 ```typescript
-// websocketMiddleware.ts
-function isBoardSync(msg: any): msg is BoardSyncMessage {
-  return (
-    msg?.type === "SYNC" &&
-    Array.isArray(msg?.payload?.board) &&
-    typeof msg?.payload?.sequence === "number"
-  );
-}
-
-socket.onmessage = (event) => {
-  const msg = parseMessage(event.data);
-  if (isBoardSync(msg)) {
-    dispatch(syncBoard(msg.payload));
+// utils/reconnectManager.ts
+const attemptReconnect = (store: Store) => {
+  if (shouldReconnect(store.getState().network)) {
+    dispatchReconnect();
+    setupConnection(store);
   }
 };
 ```
 
 ---
 
-### 类型安全保证措施
+### 架构验证清单
 
-1. **严格的类型检查配置**：
+1. **状态同步验证**
 
-```json
-// tsconfig.json
-{
-  "compilerOptions": {
-    "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true
-  }
-}
-```
+   - 断开网络模拟器查看重连流程
+   - 实时修改Redux状态观察UI同步
 
----
+2. **压力测试方案**
 
-该方案在保留原有架构设计的同时，通过 TypeScript 实现以下增强：
+   - 自动生成高频落子事件
+   - 网络延迟模拟测试
 
-1. **操作安全**：所有 Redux action 和 WebSocket 消息均被类型化
-2. **组件契约**：明确 props/state 类型约束，避免无效属性传递
-3. **数据完整**：棋盘坐标强制为元组类型，消除位置传错的潜在风险
-4. **状态保护**：使用类型守卫确保运行时类型安全
+3. **异常流测试**
+   - 对手断线时提交落子请求
+   - 在非当前回合触发落子事件
+
+建议在开发过程中采用Storybook进行组件隔离测试，优先保证核心游戏流程（创建房间-落子对战-结束返回）的完整性，再逐步实现扩展功能。
