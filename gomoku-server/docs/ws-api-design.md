@@ -24,16 +24,16 @@
 ```json
 // Client -> Server
 {
-  "type": "create_room",
-  "player_name": "Alice"
+  "type": "createRoom",
+  "playerName": "Alice"
 }
 
 // Server -> Client
 {
-  "type": "room_created",
-  "room_id": "5XQ9L",
-  "player_id": "1", // 先手玩家（黑棋）
-  "expire_time": 1800 // 房间有效期（秒）
+  "type": "roomCreated",
+  "roomId": "5XQ9L",
+  "playerId": "1", // 先手玩家（黑棋）
+  "expireTime": 1800 // 房间有效期（秒）
 }
 ```
 
@@ -42,16 +42,16 @@
 ```json
 // Client -> Server
 {
-  "type": "join_room",
-  "room_id": "5XQ9L",
-  "player_name": "Bob"
+  "type": "joinRoom",
+  "roomId": "5XQ9L",
+  "playerName": "Bob"
 }
 
 // Server -> Client (成功)
 {
-  "type": "join_success",
-  "player_id": "2", // 后手玩家（白棋）
-  "opponent_name": "Alice"
+  "type": "joinSuccess",
+  "playerId": "2", // 后手玩家（白棋）
+  "opponentName": "Alice"
 }
 
 // Server -> Client (失败)
@@ -67,22 +67,22 @@
 ```json
 // Client -> Server
 {
-  "type": "get_room_list"
+  "type": "getRoomList"
 }
 
 // Server -> Client
 {
-  "type": "room_list",
+  "type": "roomList",
   "rooms": [
     {
-      "room_id": "5XQ9L",
-      "player_count": 1,
-      "expire_time": 1800
+      "roomId": "5XQ9L",
+      "playerCount": 1,
+      "expireTime": 1800
     },
     {
-      "room_id": "7YR3M",
-      "player_count": 2,
-      "expire_time": 1200
+      "roomId": "7YR3M",
+      "playerCount": 2,
+      "expireTime": 1200
     }
   ]
 }
@@ -97,10 +97,10 @@
 ```json
 // Server -> Both Clients
 {
-  "type": "game_start",
-  "black_player": "Alice",
-  "white_player": "Bob",
-  "current_turn": "1" // 当前行动玩家ID
+  "type": "gameStart",
+  "blackPlayer": "Alice",
+  "whitePlayer": "Bob",
+  "currentTurn": "1" // 当前行动玩家ID
 }
 ```
 
@@ -109,20 +109,20 @@
 ```json
 // Client -> Server
 {
-  "type": "place_stone",
-  "room_id": "5XQ9L",
-  "player_id": "1",
+  "type": "placeStone",
+  "roomId": "5XQ9L",
+  "playerId": "1",
   "position": [8, 8] // 棋盘坐标(x,y)
 }
 
 // Server -> Both Clients
 {
-  "type": "stone_placed",
-  "room_id": "5XQ9L",
-  "player_id": "1",
+  "type": "stonePlaced",
+  "roomId": "5XQ9L",
+  "playerId": "1",
   "position": [8, 8],
-  "next_turn": "2",
-  "board_state": "..." // 可选棋盘状态编码
+  "nextTurn": "2",
+  "boardState": "..." // 可选棋盘状态编码
 }
 ```
 
@@ -131,10 +131,10 @@
 ```json
 // Server -> Both Clients
 {
-  "type": "game_over",
+  "type": "gameOver",
   "winner": "1",
-  "win_reason": "FIVE_IN_ROW",
-  "win_positions": [
+  "winReason": "FIVE_IN_ROW",
+  "winPositions": [
     [6, 8],
     [7, 8],
     [8, 8],
@@ -153,23 +153,23 @@
 ```json
 // Client -> Server
 {
-  "type": "request_undo",
-  "room_id": "5XQ9L",
-  "player_id": "2"
+  "type": "requestUndo",
+  "roomId": "5XQ9L",
+  "playerId": "2"
 }
 
 // Server -> Both Clients
 {
-  "type": "undo_requested",
+  "type": "undoRequested",
   "requester": "2"
 }
 
 // 对方确认
 // Client -> Server
 {
-  "type": "respond_undo",
-  "room_id": "5XQ9L",
-  "player_id": "1",
+  "type": "respondUndo",
+  "roomId": "5XQ9L",
+  "playerId": "1",
   "accept": true
 }
 ```
@@ -179,9 +179,9 @@
 ```json
 // Server -> Both Clients (当双方都同意时)
 {
-  "type": "game_over",
+  "type": "gameOver",
   "winner": null,
-  "win_reason": "DRAW"
+  "winReason": "DRAW"
 }
 ```
 
@@ -194,14 +194,14 @@
 ```json
 // Server -> Client (断线重连时)
 {
-  "type": "full_state",
-  "current_turn": "2",
+  "type": "fullState",
+  "currentTurn": "2",
   "board": [
     [0,0,0,...], // 0=空 1=黑 2=白
     [0,0,1,...],
     ...
   ],
-  "move_history": [
+  "moveHistory": [
     {"player":1, "pos":[8,8], "time": 1620000000},
     {"player":2, "pos":[7,7], "time": 1620000005}
   ]
@@ -250,7 +250,7 @@
 ```json
 // Server -> Client (当对手离开时)
 {
-  "type": "opponent_left",
+  "type": "opponentLeft",
   "reason": "disconnected"
 }
 ```
@@ -274,7 +274,7 @@
 
 1. 使用`type`字段区分消息类型
 2. 状态变更后服务器主动推送同步
-3. 所有操作需要携带`room_id`和`player_id`
+3. 所有操作需要携带`roomId`和`playerId`
 4. 坐标系统建议采用15x15棋盘（坐标范围0-14）
 5. 支持断线重连时的状态恢复
 
