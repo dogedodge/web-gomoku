@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { Route, Routes } from "react-router-dom";
 
 // Import your components
-import HomeScreen from "../app/HomeScreen";
+import HomeScreen from "../features/home/HomeScreen";
 // import OnlineLobbyLayout from '../features/online/components/RoomLobby/OnlineLobbyLayout';
 // import GameSession from '../features/online/components/GameSession/GameSession';
 
