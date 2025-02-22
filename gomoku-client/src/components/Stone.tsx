@@ -1,6 +1,6 @@
 import { StoneState } from "../constant";
 import { placeStone } from "../store/gameSlice";
-import { useAppDispatch } from "../store/hooks";
+import { useAppDispatch } from "../app/hooks";
 
 interface StoneProps {
   state: StoneState;

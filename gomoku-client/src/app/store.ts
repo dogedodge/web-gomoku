@@ -1,8 +1,8 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import gameSlice from "./gameSlice";
+import gameSlice from "../store/gameSlice";
 
 export const store = configureStore({
-  reducer: combineReducers({ game: gameSlice })
+  reducer: combineReducers({ game: gameSlice }),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

@@ -1,5 +1,5 @@
 import { BOARD_SIZE } from "../constant";
-import { useAppSelector } from "../store/hooks";
+import { useAppSelector } from "../app/hooks";
 import { Stone } from "./Stone";
 
 interface GameBoardProps {

@@ -1,7 +1,7 @@
 // import "./App.css";
 // import { GameBoard } from "./components/GameBoard";
 import { Provider } from "react-redux";
-import { store } from "./store/store";
+import { store } from "./app/store";
 // import { Popup } from "./components/Popup";
 
 // function App() {

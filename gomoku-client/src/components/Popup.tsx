@@ -1,5 +1,5 @@
 import { StoneState } from "../constant";
-import { useAppSelector } from "../store/hooks";
+import { useAppSelector } from "../app/hooks";
 
 export function Popup() {
   const winner = useAppSelector((state) => state.game.winner);
