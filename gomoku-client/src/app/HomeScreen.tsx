@@ -2,7 +2,7 @@
 // import { AsyncButton } from '../../common/components/AsyncButton';
 // import { CodeCopyField } from '../../common/components/CodeCopyField';
 // import { PlayerBadge } from '../../common/components/PlayerBadge';
-import "./HomeScreen.module.scss";
+// import "./HomeScreen.module.scss";
 
 const HomeScreen = () => {
   return (
