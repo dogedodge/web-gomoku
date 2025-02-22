@@ -1,5 +1,5 @@
 // import { Link } from 'react-router-dom';
-// import { AsyncButton } from '../../common/components/AsyncButton';
+import AsyncButton from "../../common/components/AsyncButton";
 // import { CodeCopyField } from '../../common/components/CodeCopyField';
 // import { PlayerBadge } from '../../common/components/PlayerBadge';
 // import "./HomeScreen.module.scss";
@@ -10,8 +10,8 @@ const HomeScreen = () => {
       <h1>Welcome to Web Gomoku</h1>
       <div className="ModeSwitch">
         <h2>Choose your gaming mode:</h2>
-        {/* <AsyncButton
-          type="button"
+        <AsyncButton
+          // type="button"
           onClick={async () => {
             // Handle offline game start logic
           }}
@@ -19,13 +19,13 @@ const HomeScreen = () => {
           Play Offline
         </AsyncButton>
         <AsyncButton
-          type="button"
+          // type="button"
           onClick={async () => {
             // Handle online game start logic
           }}
         >
           Play Online
-        </AsyncButton> */}
+        </AsyncButton>
       </div>
       {/* <div className="CodeCopyField">
         <CodeCopyField code="JOIN_CODE_HERE" />
