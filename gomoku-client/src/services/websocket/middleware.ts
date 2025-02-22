@@ -20,7 +20,13 @@ export const createSocketMiddleware = (): Middleware => {
 
         socket.onmessage = (event) => {
           const msg = JSON.parse(event.data);
-          dispatch(gameActions[msg.type](msg.payload));
+          console.log("Received message:", msg); // Log the received message for debugging purposes
+          const action = gameActions[msg.type];
+          if (action) {
+            dispatch(action(msg.payload));
+          } else {
+            console.error("Unknown action type received:", msg.type);
+          }
         };
 
         socket.onerror = (error) => {
